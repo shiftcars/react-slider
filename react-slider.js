@@ -194,6 +194,10 @@
       };
     },
 
+    componentWillMount: function () {
+      this.resizeTimeout = null;
+    },
+
     getInitialState: function () {
       var value = this._or(ensureArray(this.props.value), ensureArray(this.props.defaultValue));
 
@@ -265,6 +269,7 @@
 
     componentWillUnmount: function () {
       clearTimeout(this.resizeTimeout)
+      this.resizeTimeout = null;
       window.removeEventListener('resize', this._handleResize);
     },
 
@@ -274,6 +279,9 @@
 
     _handleResize: function () {
       // setTimeout of 0 gives element enough time to have assumed its new size if it is being resized
+      if (this.resizeTimeout !== null) {
+        clearTimeout(this.resizeTimeout);
+      }
       this.resizeTimeout = window.setTimeout(function() {
         var slider = this.refs.slider;
         var handle = this.refs.handle0;
@@ -290,6 +298,7 @@
           handleSize: handle[size],
           sliderStart: this.props.invert ? sliderMax : sliderMin
         });
+        this.resizeTimeout = null;
       }.bind(this), 0);
     },
 
